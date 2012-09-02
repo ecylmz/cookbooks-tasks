@@ -1,7 +1,10 @@
-default[:nginx][:dir]     = "/etc/nginx"
-default[:nginx][:log_dir] = "/var/log/nginx"
-default[:nginx][:user]    = "www-data"
-default[:nginx][:group]   = "www-data"
+default[:nginx][:dir]           = "/etc/nginx"
+default[:nginx][:log_dir]       = "/var/log/nginx"
+default[:nginx][:user]          = "www-data"
+default[:nginx][:group]         = "www-data"
+default[:nginx][:web_root]      = "/srv/www/"
+default[:nginx][:sites]         = ["default"]
+default[:nginx][:sites_enabled] = "false"
 
 default[:nginx][:disable_access_log] = false
 default[:nginx][:pid] = "/var/run/nginx.pid"

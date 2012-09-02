@@ -1,15 +1,4 @@
-package "nginx"
-
-service "nginx" do
-  supports :status => true, :restart => true, :reload => true
-end
-
-cookbook_file "#{node[:nginx][:dir]}/mime.types"
-
-remote_file ::File.join(node[:nginx][:dir], "common.conf") do
-  source "common.conf"
-  notifies :reload, resources(:service => "nginx")
-end
+package "nginx-extras"
 
 %w{nxensite nxdissite}.each do |nxscript|
   template "/usr/sbin/#{nxscript}" do
@@ -20,6 +9,11 @@ end
   end
 end
 
+remote_file ::File.join(node[:nginx][:dir], "common.conf") do
+  source "common.conf"
+  notifies :reload, resources(:service => "nginx")
+end
+
 template "#{node[:nginx][:dir]}/nginx.conf" do
   source "nginx.conf.erb"
   owner "root"
@@ -28,10 +22,20 @@ template "#{node[:nginx][:dir]}/nginx.conf" do
   notifies :reload, "service[nginx]"
 end
 
-service "nginx" do
-  action [ :enable, :start ]
+directory "#{node[:nginx][:web_root]}" do
+  owner "root"
+  group "root"
+  mode "0755"
+  action :create
 end
 
-nginx_site "default" do
-  enable false
+node[:nginx][:sites].each do |site|
+  nginx_site site do
+    enable node[:nginx][:sites_enabled]
+  end
+end
+
+service "nginx" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
 end
